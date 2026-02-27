@@ -13,16 +13,28 @@ load_dotenv()
 def main():
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=False)
-        context = browser.new_context(storage_state=str(AUTH_FILE))
-        page = context.new_page()
+        contextPresent = False
+
+        try: 
+            context = browser.new_context(storage_state=str(AUTH_FILE))
+            contextPresent = True
+            page = context.new_page()
+        except FileNotFoundError:
+            print("need to make new rwioqjriowjqroijqoirjqoirjqorwjqirjqorjqoirjqorjqojrwqojrq")
+            page = browser.new_page()
+            
         page.goto(COGNOS_BASE, wait_until="networkidle")
         
         page.get_by_role("button", name="Continue").click()
         
-        time.sleep(120)
-    
-        context.storage_state(path=str(AUTH_FILE))
+        expect(page).to_have_title("Content")
+        print("titled")
+
+        if not contextPresent:
+            context = browser.new_context()
+            context.storage_state(path=str(AUTH_FILE))
         
+        context.close()
         browser.close()
         
 
