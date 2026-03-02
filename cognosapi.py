@@ -2,9 +2,12 @@ import os
 import sys
 from playwright.sync_api import sync_playwright, expect
 from dotenv import find_dotenv, load_dotenv, set_key
-from rest import update_header, session
+from rest import update_header, session, content, debug_content, test_cms
 
 dotenv_path = find_dotenv()
+load_dotenv(override=True)
+
+# Consider using requests.Session(), persistent headers across calls with session.headers.update().
 
 # Try calling the api first, if it doesn't work, get a new XSRF token from cookies
 xsrf_works = True
@@ -41,12 +44,9 @@ if res.status_code != 200:
                 key_to_set = "XSRF", 
                 value_to_set = "CAM " + xsrf,
             )
-            print("1.", os.getenv("XSRF"))
             
             load_dotenv(override=True)
             update_header()
-
-            print("2.", os.getenv("XSRF"))
 
             res = session()
             
@@ -64,3 +64,10 @@ if not xsrf_works:
 
 print(res.text)
 print(res.status_code)
+
+res = content()
+
+print(res.text)
+print(res.status_code)
+
+debug_content()
